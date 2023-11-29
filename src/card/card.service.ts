@@ -15,6 +15,7 @@ import {
   ModifyConfigurationDto,
 } from './card.dto';
 import { AccountService } from '../account/account.service';
+import { CardTypeEnum } from 'src/core/enums/card-type.enum';
 
 @Injectable()
 export class CardService {
@@ -50,6 +51,10 @@ export class CardService {
 
       const encryptPin = await bcrypt.hash(card.cardNumber, 10);
       const encryptCvv = await bcrypt.hash(card.cvv, 10);
+      const cardType = card.cardType as CardTypeEnum;
+
+      const creditLimit =
+        card.cardType === CardTypeEnum.CREDIT ? card.creditLimit : null;
 
       const createCard = this.cardRepository.create({
         cardNumber: card.cardNumber,
@@ -57,6 +62,8 @@ export class CardService {
         moneyLimit: card.moneyLimit,
         pin: encryptPin,
         account,
+        creditLimit,
+        cardType,
       });
 
       const saveCard = await this.cardRepository.save(createCard);
@@ -71,7 +78,7 @@ export class CardService {
     try {
       const verifyNumberCard = await this.cardRepository.findOne({
         where: { cardNumber },
-        relations: ['account'],
+        relations: ['account', 'transactions'],
       });
 
       if (!verifyNumberCard) throw new ForbiddenException('Card number');

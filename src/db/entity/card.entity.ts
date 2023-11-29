@@ -53,6 +53,11 @@ export class Card extends BaseEntity {
   @Column({ type: 'decimal' })
   moneyLimit: number;
 
+  @IsDecimal()
+  @IsNotEmpty()
+  @Column({ type: 'decimal', nullable: true })
+  creditLimit?: number;
+
   @IsString()
   @IsNotEmpty()
   @Length(3, 3, { message: 'The pin must have exactly 3 digits' })

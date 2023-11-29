@@ -3,6 +3,7 @@ export class CreateCardDto {
   cardType: string;
   cvv: string;
   moneyLimit: number;
+  creditLimit: number;
   iban: string;
 }
 
