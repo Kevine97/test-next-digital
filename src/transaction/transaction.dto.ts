@@ -6,3 +6,10 @@ export class WithdrawingMoneyDto {
   numberCard: string;
   enttity: string;
 }
+
+export class DepositMoneyDto {
+  type: transactionTypeEnum;
+  amount: number;
+  numberCard: string;
+  enttityAtm: string;
+}

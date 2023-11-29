@@ -9,7 +9,7 @@ import { Account } from 'src/db/entity/account.entity';
 import { Card } from 'src/db/entity/card.entity';
 import { Transaction } from 'src/db/entity/transaction.entity';
 import { Repository } from 'typeorm';
-import { WithdrawingMoneyDto } from './transaction.dto';
+import { DepositMoneyDto, WithdrawingMoneyDto } from './transaction.dto';
 import { CardTypeEnum } from 'src/core/enums/card-type.enum';
 import { transactionTypeEnum } from 'src/core/enums/transaction-type';
 
@@ -89,6 +89,40 @@ export class TransactionService {
           );
 
       return 'Money successfully withdrawn';
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async depositMoney(depositMoneyDto: DepositMoneyDto): Promise<string> {
+    try {
+      const card = await this.verifyCardIsActive(depositMoneyDto.numberCard);
+
+      if (card.account.entity !== depositMoneyDto.enttityAtm)
+        throw new HttpException(
+          'You cannot deposit money in this atm',
+          HttpStatus.CONFLICT,
+        );
+
+      const createTrasaction = this.transactionRepository.create({
+        account: card.account,
+        card: card,
+        amount: depositMoneyDto.amount,
+        type: 'deposit' as transactionTypeEnum,
+      });
+
+      const saveTransaction =
+        await this.transactionRepository.save(createTrasaction);
+
+      const addCurrentBalance =
+        parseFloat(card.account.availableBalance) + depositMoneyDto.amount;
+      const depositMoney = await this.accountRepository.update(
+        { iban: card.account.iban },
+        { availableBalance: addCurrentBalance.toString() },
+      );
+
+      return 'Money successfully deposited';
     } catch (error) {
       console.log(error);
       throw error;
