@@ -13,6 +13,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsString,
+  Length,
 } from 'class-validator';
 import { BaseEntity } from './base/base';
 import { Transaction } from './transaction.entity';
@@ -51,6 +52,12 @@ export class Card extends BaseEntity {
   @IsNotEmpty()
   @Column({ type: 'decimal' })
   moneyLimit: number;
+
+  @IsString()
+  @IsNotEmpty()
+  @Length(3, 3, { message: 'The pin must have exactly 3 digits' })
+  @Column()
+  pin: string;
 
   @OneToMany(() => Transaction, (transaction) => transaction.card)
   transactions: Transaction[];
