@@ -13,3 +13,9 @@ export class DepositMoneyDto {
   numberCard: string;
   enttityAtm: string;
 }
+
+export class TransferMoneyDto {
+  ibanEmitter: string;
+  ibanReceiver: string;
+  amount: number;
+}

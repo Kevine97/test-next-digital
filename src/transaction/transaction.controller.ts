@@ -1,6 +1,10 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
-import { DepositMoneyDto, WithdrawingMoneyDto } from './transaction.dto';
+import {
+  DepositMoneyDto,
+  TransferMoneyDto,
+  WithdrawingMoneyDto,
+} from './transaction.dto';
 
 @Controller('api/v1/transaction')
 export class TransactionController {
@@ -18,5 +22,12 @@ export class TransactionController {
     @Body() depositMoneyDto: DepositMoneyDto,
   ): Promise<string> {
     return await this.transactionService.depositMoney(depositMoneyDto);
+  }
+
+  @Post('transfer-money')
+  async transferMoney(
+    @Body() transferMoneyDto: TransferMoneyDto,
+  ): Promise<string> {
+    return await this.transactionService.transferMoney(transferMoneyDto);
   }
 }

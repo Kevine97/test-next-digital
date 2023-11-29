@@ -9,7 +9,11 @@ import { Account } from 'src/db/entity/account.entity';
 import { Card } from 'src/db/entity/card.entity';
 import { Transaction } from 'src/db/entity/transaction.entity';
 import { Repository } from 'typeorm';
-import { DepositMoneyDto, WithdrawingMoneyDto } from './transaction.dto';
+import {
+  DepositMoneyDto,
+  TransferMoneyDto,
+  WithdrawingMoneyDto,
+} from './transaction.dto';
 import { CardTypeEnum } from 'src/core/enums/card-type.enum';
 import { transactionTypeEnum } from 'src/core/enums/transaction-type';
 
@@ -123,6 +127,76 @@ export class TransactionService {
       );
 
       return 'Money successfully deposited';
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async transferMoney(transferMoneyDto: TransferMoneyDto): Promise<string> {
+    try {
+      const accountEmiter = await this.accountRepository.findOne({
+        where: { iban: transferMoneyDto.ibanEmitter },
+      });
+
+      if (!accountEmiter) throw new ForbiddenException('Account Iban Emiter');
+
+      const accountReeceiver = await this.accountRepository.findOne({
+        where: { iban: transferMoneyDto.ibanReceiver },
+      });
+
+      if (!accountReeceiver)
+        throw new ForbiddenException('Account Iban Reeceiver');
+
+      if (transferMoneyDto.amount <= 0)
+        throw new HttpException(
+          'The amount must be greater than 0',
+          HttpStatus.CONFLICT,
+        );
+
+      if (transferMoneyDto.amount > parseFloat(accountEmiter.availableBalance))
+        throw new HttpException(
+          'You do not have a sufficient balance for this transfer.',
+          HttpStatus.CONFLICT,
+        );
+
+      let commission = 0;
+
+      if (accountEmiter.entity !== accountReeceiver.entity) commission = 5;
+
+      const subtractingBalance =
+        parseFloat(accountEmiter.availableBalance) -
+        transferMoneyDto.amount -
+        commission;
+
+      const updateAccountEmiter = await this.accountRepository.update(
+        { iban: accountEmiter.iban },
+        {
+          availableBalance: subtractingBalance.toString(),
+        },
+      );
+
+      const addCurrentBalance =
+        parseFloat(accountReeceiver.availableBalance) + transferMoneyDto.amount;
+
+      const updateAccountReeceiver = await this.accountRepository.update(
+        { iban: accountReeceiver.iban },
+        {
+          availableBalance: addCurrentBalance.toString(),
+        },
+      );
+
+      const createTrasaction = this.transactionRepository.create({
+        account: accountEmiter,
+        amount: transferMoneyDto.amount,
+        type: 'transfer' as transactionTypeEnum,
+        commission,
+      });
+
+      const saveTransaction =
+        await this.transactionRepository.save(createTrasaction);
+
+      return 'Transfer successful';
     } catch (error) {
       console.log(error);
       throw error;
