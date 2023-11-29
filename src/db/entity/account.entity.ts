@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { BaseEntity } from './base/base';
-import { bankingEntitiesEnum } from 'src/core/enums/banking.entities.enum';
+import { bankingEntitiesEnum } from '../../core/enums/banking.entities.enum';
 import { Card } from './card.entity';
 import { Transaction } from './transaction.entity';
 
