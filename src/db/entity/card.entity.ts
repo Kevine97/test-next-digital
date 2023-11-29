@@ -51,4 +51,14 @@ export class Card extends BaseEntity {
   @IsNotEmpty()
   @Column({ type: 'decimal' })
   moneyLimit: number;
+
+  @OneToMany(() => Transaction, (transaction) => transaction.card)
+  transactions: Transaction[];
+
+  @ManyToOne(() => Account, (account) => account.cards)
+  @JoinColumn({
+    name: 'accountId',
+    referencedColumnName: 'accountId',
+  })
+  account: Account;
 }

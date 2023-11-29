@@ -5,9 +5,11 @@ import {
   IsString,
   IsDecimal,
 } from 'class-validator';
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { BaseEntity } from './base/base';
 import { bankingEntitiesEnum } from 'src/core/enums/banking.entities.enum';
+import { Card } from './card.entity';
+import { Transaction } from './transaction.entity';
 
 @Entity('account')
 export class Account extends BaseEntity {
@@ -31,4 +33,10 @@ export class Account extends BaseEntity {
   @IsDecimal()
   @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.00' })
   availableBalance: string;
+
+  @OneToMany(() => Transaction, (transaction) => transaction.account)
+  transactions: Transaction[];
+
+  @OneToMany(() => Card, (card) => card.account)
+  cards: Card[];
 }
