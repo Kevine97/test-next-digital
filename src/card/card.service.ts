@@ -13,6 +13,7 @@ import {
   ChangePinDto,
   CreateCardDto,
   ModifyConfigurationDto,
+  ResponseMenssageOK,
 } from './card.dto';
 import { AccountService } from '../account/account.service';
 import { CardTypeEnum } from 'src/core/enums/card-type.enum';
@@ -25,7 +26,7 @@ export class CardService {
     private accountService: AccountService,
   ) {}
 
-  async createCard(card: CreateCardDto): Promise<string> {
+  async createCard(card: CreateCardDto): Promise<ResponseMenssageOK> {
     try {
       const verifyNumberCard = await this.cardRepository.findOne({
         where: { cardNumber: card.cardNumber },
@@ -67,7 +68,9 @@ export class CardService {
       });
 
       const saveCard = await this.cardRepository.save(createCard);
-      return 'Successfully created card';
+      return {
+        msg: 'ResponseMenssageOK',
+      };
     } catch (error) {
       console.log(error);
       throw error;
@@ -90,7 +93,7 @@ export class CardService {
     }
   }
 
-  async activeCardByNumber(cardNumber: string): Promise<string> {
+  async activeCardByNumber(cardNumber: string): Promise<ResponseMenssageOK> {
     try {
       const verifyNumberCard = await this.cardRepository.findOne({
         where: { cardNumber },
@@ -109,14 +112,19 @@ export class CardService {
 
       console.log(activeCard);
 
-      return 'Card successfully activated';
+      return {
+        msg: 'Card successfully activated',
+      };
     } catch (error) {
       console.log(error);
       throw error;
     }
   }
 
-  async changePin(cardNumber: string, pins: ChangePinDto): Promise<string> {
+  async changePin(
+    cardNumber: string,
+    pins: ChangePinDto,
+  ): Promise<ResponseMenssageOK> {
     try {
       const verifyNumberCard = await this.cardRepository.findOne({
         where: { cardNumber },
@@ -148,7 +156,9 @@ export class CardService {
         },
       );
 
-      return 'Pin successfully changed';
+      return {
+        msg: 'Pin successfully changed',
+      };
     } catch (error) {
       console.log(error);
       throw error;
@@ -158,7 +168,7 @@ export class CardService {
   async modifyConfiguration(
     cardNumber: string,
     modifyConfiguration: ModifyConfigurationDto,
-  ): Promise<string> {
+  ): Promise<ResponseMenssageOK> {
     try {
       const verifyNumberCard = await this.cardRepository.findOne({
         where: { cardNumber },
@@ -195,7 +205,9 @@ export class CardService {
         },
       );
 
-      return ' Account successfully configured';
+      return {
+        msg: ' Account successfully configured',
+      };
     } catch (error) {
       console.log(error);
       throw error;

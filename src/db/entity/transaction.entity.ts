@@ -10,6 +10,7 @@ import { IsDecimal, IsEnum, IsNotEmpty } from 'class-validator';
 import { BaseEntity } from './base/base';
 import { Account } from './account.entity';
 import { Card } from './card.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('transaction')
 export class Transaction extends BaseEntity {
@@ -18,6 +19,7 @@ export class Transaction extends BaseEntity {
 
   @IsEnum(transactionTypeEnum)
   @IsNotEmpty()
+  @ApiProperty()
   @Column({
     type: 'enum',
     enum: transactionTypeEnum,
@@ -26,10 +28,12 @@ export class Transaction extends BaseEntity {
 
   @IsDecimal()
   @IsNotEmpty()
+  @ApiProperty()
   @Column({ type: 'decimal' })
   amount: number;
 
   @IsDecimal()
+  @ApiProperty()
   @Column({ nullable: true, type: 'decimal' })
   commission: number;
 

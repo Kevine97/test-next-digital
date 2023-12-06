@@ -1,0 +1,4 @@
+.mysql-data/
+dist/
+node_modules/
+.git/

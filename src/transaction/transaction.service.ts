@@ -16,6 +16,7 @@ import {
 } from './transaction.dto';
 import { CardTypeEnum } from 'src/core/enums/card-type.enum';
 import { transactionTypeEnum } from 'src/core/enums/transaction-type';
+import { ResponseMenssageOK } from 'src/card/card.dto';
 
 @Injectable()
 export class TransactionService {
@@ -28,7 +29,7 @@ export class TransactionService {
 
   async withdrawingMoney(
     withdrawingMoneyDto: WithdrawingMoneyDto,
-  ): Promise<string> {
+  ): Promise<ResponseMenssageOK> {
     try {
       const card = await this.verifyCardIsActive(
         withdrawingMoneyDto.numberCard,
@@ -77,29 +78,38 @@ export class TransactionService {
       const saveTransaction =
         await this.transactionRepository.save(createTrasaction);
 
-      const subtractingBalance =
+      const subtractingBalanceCredit =
         card.creditLimit - withdrawingMoneyDto.amount - commission;
+
+      const subtractingBalanceDebit =
+        parseFloat(card.account.availableBalance) -
+        withdrawingMoneyDto.amount -
+        commission;
 
       cardType === CardTypeEnum.CREDIT
         ? await this.cardRepository.update(
             { cardNumber: card.cardNumber },
             {
-              creditLimit: subtractingBalance,
+              creditLimit: subtractingBalanceCredit,
             },
           )
         : await this.accountRepository.update(
             { iban: card.account.iban },
-            { availableBalance: subtractingBalance.toString() },
+            { availableBalance: subtractingBalanceDebit.toString() },
           );
 
-      return 'Money successfully withdrawn';
+      return {
+        msg: 'Money successfully withdrawn',
+      };
     } catch (error) {
       console.log(error);
       throw error;
     }
   }
 
-  async depositMoney(depositMoneyDto: DepositMoneyDto): Promise<string> {
+  async depositMoney(
+    depositMoneyDto: DepositMoneyDto,
+  ): Promise<ResponseMenssageOK> {
     try {
       const card = await this.verifyCardIsActive(depositMoneyDto.numberCard);
 
@@ -126,14 +136,18 @@ export class TransactionService {
         { availableBalance: addCurrentBalance.toString() },
       );
 
-      return 'Money successfully deposited';
+      return {
+        msg: 'Money successfully deposited',
+      };
     } catch (error) {
       console.log(error);
       throw error;
     }
   }
 
-  async transferMoney(transferMoneyDto: TransferMoneyDto): Promise<string> {
+  async transferMoney(
+    transferMoneyDto: TransferMoneyDto,
+  ): Promise<ResponseMenssageOK> {
     try {
       const accountEmiter = await this.accountRepository.findOne({
         where: { iban: transferMoneyDto.ibanEmitter },
@@ -196,7 +210,9 @@ export class TransactionService {
       const saveTransaction =
         await this.transactionRepository.save(createTrasaction);
 
-      return 'Transfer successful';
+      return {
+        msg: 'Transfer successful',
+      };
     } catch (error) {
       console.log(error);
       throw error;

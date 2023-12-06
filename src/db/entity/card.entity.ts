@@ -18,6 +18,7 @@ import {
 import { BaseEntity } from './base/base';
 import { Transaction } from './transaction.entity';
 import { Account } from './account.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('card')
 export class Card extends BaseEntity {
@@ -26,11 +27,13 @@ export class Card extends BaseEntity {
 
   @IsString()
   @IsNotEmpty()
+  @ApiProperty()
   @Column({ unique: true })
   cardNumber: string;
 
   @IsEnum(CardTypeEnum)
   @IsNotEmpty()
+  @ApiProperty()
   @Column({
     enum: CardTypeEnum,
     type: 'enum',
@@ -39,6 +42,7 @@ export class Card extends BaseEntity {
 
   @IsString()
   @IsNotEmpty()
+  @ApiProperty()
   @Column()
   cvv: string;
 
@@ -50,17 +54,20 @@ export class Card extends BaseEntity {
 
   @IsDecimal()
   @IsNotEmpty()
+  @ApiProperty()
   @Column({ type: 'decimal' })
   moneyLimit: number;
 
   @IsDecimal()
   @IsNotEmpty()
+  @ApiProperty()
   @Column({ type: 'decimal', nullable: true })
   creditLimit?: number;
 
   @IsString()
   @IsNotEmpty()
   @Length(3, 3, { message: 'The pin must have exactly 3 digits' })
+  @ApiProperty()
   @Column()
   pin: string;
 

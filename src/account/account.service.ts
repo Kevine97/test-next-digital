@@ -40,7 +40,7 @@ export class AccountService {
     try {
       const verifyIban = await this.accountRepository.findOne({
         where: { iban },
-        relations: ['cards', 'transactions'],
+        relations: ['cards', 'cards.transactions'],
       });
 
       if (!verifyIban) throw new ForbiddenException('Account');

@@ -10,6 +10,7 @@ import { BaseEntity } from './base/base';
 import { bankingEntitiesEnum } from '../../core/enums/banking.entities.enum';
 import { Card } from './card.entity';
 import { Transaction } from './transaction.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('account')
 export class Account extends BaseEntity {
@@ -19,10 +20,12 @@ export class Account extends BaseEntity {
   @IsNotEmpty()
   @IsString()
   @IsIBAN()
+  @ApiProperty()
   @Column({ unique: true })
   iban: string;
 
   @IsNotEmpty()
+  @ApiProperty()
   @IsEnum(bankingEntitiesEnum)
   @Column({
     type: 'enum',
@@ -31,6 +34,7 @@ export class Account extends BaseEntity {
   entity: bankingEntitiesEnum;
 
   @IsDecimal()
+  @ApiProperty()
   @Column({ type: 'decimal', precision: 10, scale: 2, default: '0.00' })
   availableBalance: string;
 
